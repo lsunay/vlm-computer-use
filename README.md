@@ -1,284 +1,428 @@
-# 🎨 Vision Language Model Demo Application
+# 🎨 Vision Language Model Demo - Complete Edition
 
-A powerful, privacy-focused demo application for vision-language models with **Bring Your Own Provider** support. Chat with images, analyze videos, and generate code from screenshots using OpenAI, Anthropic, Ollama, or any custom OpenAI-compatible API.
+### 30+ Features | Multi-Provider | Privacy-First | Production-Ready
 
-## ✨ Features
+A comprehensive vision-language model application with chat, code generation, batch processing, OCR, analytics, and much more. Built with flexibility and privacy in mind.
 
-- **🔌 Multiple Provider Support**: OpenAI, Anthropic Claude, Ollama (local), or custom APIs
-- **💬 Multi-Image Chat**: Interactive conversations with multiple images
-- **🖼️ Screenshot-to-Code**: Generate HTML/CSS code from design screenshots
-- **🎥 Video Analysis**: Analyze videos by extracting and processing key frames
-- **🧠 Multiple Modes**: Chat, Analysis, and Deep Thinking modes
-- **🔒 Privacy-First**: Use local models via Ollama or your own API endpoints
-- **🎛️ Flexible Configuration**: UI-based setup or environment variables
+[![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Gradio](https://img.shields.io/badge/Gradio-4.0+-orange.svg)](https://gradio.app/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+---
+
+## 🌟 What's New in V2?
+
+**V2 introduces 25+ new features** while keeping everything from V1:
+
+- 💬 **Chat History & Export** - Persistent conversations, export to MD/JSON/PDF
+- 🖼️ **Live Code Preview** - See generated HTML instantly
+- 📦 **Batch Processing** - Process 100s of images at once
+- ⚖️ **Image Comparison** - Compare multiple images side-by-side
+- 📄 **Advanced OCR** - Extract text and tables from images
+- ⚡ **70+ Presets** - Quick-action templates for common tasks
+- 💰 **Cost Tracking** - Real-time API usage monitoring
+- 🗄️ **Database** - SQLite for persistence
+- 🌐 **REST API** - FastAPI endpoints
+- 🔧 **Code Refinement** - Iteratively improve generated code
+
+[See all features →](FEATURES.md)
+
+---
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### One-Command Start
 
-- Python 3.8 or higher
-- pip (Python package manager)
-
-### Installation
-
-1. **Clone or download this repository**
-
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Configure your provider:**
-
-   Copy the example environment file:
-   ```bash
-   cp .env.example .env
-   ```
-
-   Edit `.env` with your preferred settings:
-   ```bash
-   # Choose your provider
-   DEFAULT_PROVIDER=openai  # or anthropic, ollama, custom
-
-   # Add your API keys
-   OPENAI_API_KEY=your-key-here
-   ANTHROPIC_API_KEY=your-key-here
-   ```
-
-4. **Run the application:**
-   ```bash
-   python app.py
-   ```
-
-5. **Open your browser:**
-   ```
-   http://localhost:7860
-   ```
-
-## 🔧 Configuration
-
-### Provider Options
-
-#### 1. OpenAI (GPT-4 Vision)
-```env
-DEFAULT_PROVIDER=openai
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o
-```
-
-#### 2. Anthropic Claude
-```env
-DEFAULT_PROVIDER=anthropic
-ANTHROPIC_API_KEY=sk-ant-...
-ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
-```
-
-#### 3. Ollama (Local Models)
-```env
-DEFAULT_PROVIDER=ollama
-OLLAMA_BASE_URL=http://localhost:11434/v1
-OLLAMA_MODEL=llava:latest
-```
-
-First, install and run Ollama:
 ```bash
-# Install Ollama from https://ollama.ai
-
-# Pull a vision model
-ollama pull llava
-
-# Or use a larger model
-ollama pull llava:13b
+# Clone and run
+git clone https://github.com/yourusername/vlm-computer-use
+cd vlm-computer-use
+./start.sh  # or: python run_app.py
 ```
 
-#### 4. Custom Provider (OpenAI-compatible)
-```env
-DEFAULT_PROVIDER=custom
-CUSTOM_API_KEY=your-key
-CUSTOM_BASE_URL=http://your-endpoint/v1
-CUSTOM_MODEL=your-model-name
+### Manual Setup
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Configure provider (choose one)
+cp .env.example .env
+# Edit .env with your settings
+
+# 3. Run the app
+python app.py
+
+# 4. Open browser
+# http://localhost:7860
 ```
 
-Works with:
-- LM Studio
-- LocalAI
-- vLLM
-- Any OpenAI-compatible API
+### Docker
 
-### Dynamic Configuration
+```bash
+# Quick start with Docker Compose (includes Ollama)
+docker-compose up -d
 
-You can also configure providers directly in the UI:
-1. Go to the "Configuration" tab
-2. Select your provider type
-3. Enter API key, base URL, and model (optional)
-4. Click "Initialize Provider"
+# Or build and run manually
+docker build -t vlm-demo .
+docker run -p 7860:7860 --env-file .env vlm-demo
+```
 
-## 📖 Usage Guide
+---
 
-### 💬 Chat with Images
+## ✨ Features Overview
 
-1. Navigate to the "Chat with Images" tab
-2. Select a mode:
-   - **Chat**: General conversation
-   - **Analysis**: Detailed image analysis
-   - **Thinking**: Deep reasoning with step-by-step explanation
-3. Upload one or more images
-4. Type your question and click "Send"
+### 🎯 Core Features
 
-**Example prompts:**
-- "What's in this image?"
-- "Compare these two screenshots"
-- "Describe the color scheme and design patterns"
-- "Find any text in this image and transcribe it"
+| Feature | Description |
+|---------|-------------|
+| **Multi-Image Chat** | Interactive conversations with images, 3 modes (Chat/Analysis/Thinking) |
+| **Screenshot-to-Code** | Generate HTML/React/Vue/Tailwind from designs + Live Preview |
+| **Batch Processing** | Process multiple images, export to CSV/JSON |
+| **Image Comparison** | Compare 2-10 images with similarity scores |
+| **OCR & Tables** | Extract text (multi-language) and tables from images |
+| **Video Analysis** | Analyze videos via frame extraction (4-16 frames) |
+| **Preset Prompts** | 70+ templates for quick actions |
+| **Cost Tracking** | Real-time token counting and cost calculation |
+| **Chat History** | Persistent conversations with search and export |
+| **REST API** | Full FastAPI backend for integration |
 
-### 🖼️ Screenshot to Code
+### 🔌 Provider Support
 
-1. Go to the "Screenshot to Code" tab
-2. Upload one or more screenshots of a design
-3. (Optional) Add specific instructions
-4. Click "Generate Code"
-5. Copy the generated HTML/CSS code
+- **OpenAI** (GPT-4o, GPT-4o-mini, GPT-4 Turbo)
+- **Anthropic** (Claude 3.5 Sonnet, Opus, Haiku)
+- **Ollama** (LLaVA, BakLLaVA - 100% Local & Free)
+- **Custom APIs** (LM Studio, vLLM, LocalAI, any OpenAI-compatible)
 
-**Tips:**
-- Works best with clean, complete designs
-- Upload multiple screenshots for complex layouts
-- Specify frameworks in instructions (e.g., "Use Tailwind CSS")
+### 🎨 Code Generation
 
-### 🎥 Video Analysis
+Generate code in multiple frameworks:
+- HTML/CSS (vanilla)
+- React (functional components)
+- Vue 3 (Composition API)
+- Tailwind CSS
+- Bootstrap 5
 
-1. Open the "Video Analysis" tab
-2. Upload a video file
-3. Enter your question about the video
-4. Adjust the number of frames to extract (4-16)
-5. Click "Analyze Video"
+With features:
+- Live preview
+- Iterative refinement
+- Download as files
+- Syntax highlighting
 
-**Use cases:**
-- Summarize video content
-- Identify specific moments or objects
-- Analyze changes over time
-- Extract information from tutorials
+---
+
+## 📚 Documentation
+
+- **[Quick Start Guide](QUICKSTART.md)** - Get started in 5 minutes
+- **[Complete Feature List](FEATURES.md)** - All 30+ features explained
+- **[API Documentation](API_DOCS.md)** - REST API reference
+- **[Upgrade Guide](UPGRADE_GUIDE.md)** - Migrating from V1 to V2
+
+---
+
+## 🎯 Use Cases
+
+### For Developers
+- Convert Figma/designs to code
+- Debug with screenshots
+- Code review assistance
+- Documentation generation
+
+### For Designers
+- UI/UX critiques
+- Accessibility audits
+- Design system extraction
+- A/B test analysis
+
+### For Business
+- Receipt/invoice processing
+- Document digitization
+- Quality control
+- Competitor analysis
+
+### For Content Creators
+- Image captions & alt text
+- Social media content
+- Batch image descriptions
+- Brand consistency checks
+
+### For Researchers
+- Image classification
+- Data extraction from charts
+- Experiment documentation
+- Visual data analysis
+
+---
 
 ## 🏗️ Architecture
 
 ```
 vlm-computer-use/
-├── app.py              # Main Gradio application
-├── providers.py        # Provider abstraction layer
-├── utils.py           # Utility functions
-├── requirements.txt   # Python dependencies
-├── .env.example       # Environment template
-└── README.md          # Documentation
+├── app.py                 # Main Gradio UI application
+├── app_v2.py             # Core VLM logic and features
+├── providers.py          # Multi-provider abstraction
+├── utils.py              # Basic utilities
+├── advanced_utils.py     # OCR, batch, cost tracking
+├── database.py           # SQLite persistence
+├── presets.py            # Preset prompts library
+├── api.py                # FastAPI REST endpoints
+├── requirements.txt      # Python dependencies
+├── .env.example          # Configuration template
+├── Dockerfile            # Container config
+├── docker-compose.yml    # Multi-container setup
+└── docs/                 # Documentation
 ```
 
-### Key Components
+### Tech Stack
 
-- **`providers.py`**: Abstraction layer supporting multiple LLM providers
-- **`app.py`**: Gradio UI with tabs for different features
-- **`utils.py`**: Helper functions for image/video processing
-
-## 🔐 Privacy & Security
-
-- **Local-first**: Use Ollama to run everything locally
-- **No data sharing**: Your images never leave your infrastructure
-- **API key security**: Store keys in `.env` (never commit!)
-- **Flexible hosting**: Run on your own servers
-
-## 🛠️ Advanced Usage
-
-### Using with LM Studio
-
-1. Download and run [LM Studio](https://lmstudio.ai/)
-2. Load a vision model
-3. Start the local server
-4. Configure the app:
-   ```env
-   DEFAULT_PROVIDER=custom
-   CUSTOM_BASE_URL=http://localhost:1234/v1
-   CUSTOM_MODEL=your-model-name
-   ```
-
-### Using with vLLM
-
-```bash
-# Start vLLM server
-vllm serve llava-hf/llava-1.5-7b-hf --port 8000
-
-# Configure app
-DEFAULT_PROVIDER=custom
-CUSTOM_BASE_URL=http://localhost:8000/v1
-CUSTOM_MODEL=llava-hf/llava-1.5-7b-hf
-```
-
-### Docker Deployment (Optional)
-
-Create a `Dockerfile`:
-```dockerfile
-FROM python:3.10-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 7860
-CMD ["python", "app.py"]
-```
-
-Build and run:
-```bash
-docker build -t vlm-demo .
-docker run -p 7860:7860 --env-file .env vlm-demo
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Improve documentation
-
-## 📝 License
-
-This project is open source and available under the MIT License.
-
-## 🙏 Acknowledgments
-
-Inspired by the GLM-4.5V Demo App, rebuilt from scratch to support multiple providers and prioritize privacy and flexibility.
-
-## 📚 Resources
-
-- [OpenAI Vision API](https://platform.openai.com/docs/guides/vision)
-- [Anthropic Claude](https://www.anthropic.com/claude)
-- [Ollama](https://ollama.ai/)
-- [Gradio](https://gradio.app/)
-
-## 🐛 Troubleshooting
-
-### "Provider not initialized" error
-- Go to Configuration tab and initialize your provider first
-
-### Ollama connection failed
-- Make sure Ollama is running: `ollama serve`
-- Check the base URL is correct: `http://localhost:11434/v1`
-
-### Images not uploading
-- Ensure images are in supported formats (JPEG, PNG, WebP)
-- Check file size (very large images are automatically resized)
-
-### Video analysis not working
-- Install OpenCV: `pip install opencv-python`
-- Ensure video file is in a common format (MP4, AVI, MOV)
-
-## 💡 Tips & Best Practices
-
-1. **Cost Optimization**: Use Ollama for development and testing
-2. **Quality**: Use GPT-4o or Claude 3.5 Sonnet for production
-3. **Performance**: Reduce video frames for faster processing
-4. **Security**: Never commit `.env` file to version control
-5. **Scaling**: Deploy behind a reverse proxy (nginx) for production
+- **UI**: Gradio 4.0+
+- **LLM Providers**: OpenAI SDK, Anthropic SDK
+- **Database**: SQLAlchemy + SQLite
+- **API**: FastAPI + Uvicorn
+- **OCR**: Tesseract, EasyOCR
+- **Processing**: PIL, OpenCV, pandas
+- **Cost Tracking**: tiktoken
 
 ---
 
-Made with ❤️ for the open source community
+## ⚙️ Configuration
+
+### Quick Setup (Ollama - Free & Local)
+
+```bash
+# 1. Install Ollama
+# Download from https://ollama.ai
+
+# 2. Pull a vision model
+ollama pull llava
+
+# 3. Configure
+DEFAULT_PROVIDER=ollama
+OLLAMA_MODEL=llava:latest
+
+# 4. Run
+python app.py
+```
+
+### OpenAI Setup
+
+```bash
+# .env
+DEFAULT_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key-here
+OPENAI_MODEL=gpt-4o
+```
+
+### Anthropic Setup
+
+```bash
+# .env
+DEFAULT_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
+```
+
+### All Options
+
+See [.env.example](.env.example) for complete configuration options.
+
+---
+
+## 🚢 Deployment
+
+### Local Development
+
+```bash
+python app.py
+# or
+python run_app.py
+```
+
+### Production (Docker)
+
+```bash
+docker-compose up -d
+```
+
+### Heroku
+
+```bash
+heroku create your-app-name
+git push heroku main
+```
+
+### Railway
+
+```bash
+# Connect your repo to Railway
+# Set environment variables
+# Deploy automatically
+```
+
+### VPS/Cloud
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run with supervisor/systemd
+# nginx reverse proxy
+# SSL with Let's Encrypt
+```
+
+---
+
+## 📊 API Usage
+
+### Start API Server
+
+```bash
+# Standalone
+python api.py
+
+# Or with Uvicorn
+uvicorn api:app --host 0.0.0.0 --port 8000
+
+# Docs at http://localhost:8000/docs
+```
+
+### Quick Example
+
+```python
+import requests
+
+# Chat with image
+files = {'images': open('image.jpg', 'rb')}
+data = {'message': 'What is this?', 'provider': 'openai'}
+
+response = requests.post(
+    'http://localhost:8000/api/chat',
+    files=files,
+    data=data
+)
+
+print(response.json()['response'])
+```
+
+[Full API Documentation →](API_DOCS.md)
+
+---
+
+## 🎨 Screenshots
+
+### Chat Interface
+```
+┌─────────────────────────────────────────┐
+│  💬 Chat with Images                    │
+├─────────────────────────────────────────┤
+│  [Image]                                │
+│  User: What's in this image?            │
+│  Assistant: I see a beautiful...        │
+│  ┌───────────────────────────────┐     │
+│  │ 💰 Cost: $0.0012 | 1,234 tokens│     │
+│  └───────────────────────────────┘     │
+└─────────────────────────────────────────┘
+```
+
+### Code Generation
+```
+┌─────────────────────────────────────────┐
+│  🖼️ Screenshot to Code                  │
+├─────────────────────────────────────────┤
+│  [Screenshot] → [Generated Code]        │
+│  ┌────────────┐   ┌──────────────────┐ │
+│  │   Design   │   │  Live Preview    │ │
+│  └────────────┘   └──────────────────┘ │
+│  Framework: React | Tailwind           │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 🔒 Privacy & Security
+
+### Local-First Option
+
+Run 100% locally with Ollama:
+- No data leaves your machine
+- No API costs
+- Complete privacy
+- Full control
+
+### Security Best Practices
+
+1. ✅ Store API keys in `.env` (gitignored)
+2. ✅ Use environment variables for secrets
+3. ✅ Enable API authentication in production
+4. ✅ Restrict CORS origins
+5. ✅ Regular dependency updates
+6. ✅ Database backups
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- Inspired by GLM-4.5V Demo App
+- Built with [Gradio](https://gradio.app/)
+- Powered by [OpenAI](https://openai.com/), [Anthropic](https://anthropic.com/), and [Ollama](https://ollama.ai/)
+
+---
+
+## 📞 Support
+
+- 📖 **Documentation**: [/docs](/docs)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/vlm-computer-use/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/vlm-computer-use/discussions)
+- 📧 **Email**: support@example.com
+
+---
+
+## 🗺️ Roadmap
+
+### V2.1 (Current)
+- [x] All 30+ features
+- [x] Full documentation
+- [x] REST API
+- [ ] Unit tests
+- [ ] Performance benchmarks
+
+### V3.0 (Planned)
+- [ ] Voice input/output
+- [ ] Multi-user support
+- [ ] Browser extension
+- [ ] Mobile apps (iOS/Android)
+- [ ] Advanced automation
+- [ ] Fine-tuning support
+- [ ] Real-time collaboration
+
+[See detailed roadmap →](ROADMAP.md)
+
+---
+
+## ⭐ Star History
+
+If you find this project useful, please consider giving it a star!
+
+---
+
+**Made with ❤️ by the open source community**
+
+**Version:** 2.0 Complete | **Features:** 30+ | **Providers:** 4+
