@@ -57,25 +57,67 @@ async def transcribe_file_whisper(file_path, model, language, output_format):
         with open(file_path, "rb") as f:
             file_data = base64.b64encode(f.read()).decode()
 
-        # Prepare API payload (matching Whisper-WebUI format with base64)
+        # Prepare API payload with all 54 parameters (matching Whisper-WebUI exactly)
         payload = {
             "data": [
                 [
-                    {
-                        "path": f"data:audio/wav;base64,{file_data}",
-                        "meta": {"_type": "gradio.FileData"},
-                    }
-                ],  # File in list with base64
-                language,  # language
-                False,  # translate
-                True,  # srt_timestamps
-                output_format,  # output_format
-                True,  # vad_filter
-                model,  # model
-                "english",  # initial_prompt_language
-                True,  # use_vad
-                3,  # vad_threshold
-                3,  # vad_method
+                    {"path": f"data:video/mp4;base64,{file_data}", "meta": {"_type": "gradio.FileData"}}
+                ],  # files
+                "",  # input_folder_path
+                False,  # include_subdirectory
+                True,  # save_same_dir
+                output_format,  # file_format
+                False,  # add_timestamp
+                model,  # progress (model)
+                language,  # param_7 (language)
+                False,  # param_8 (translate)
+                5.0,  # param_9 (beam_size)
+                -1.0,  # param_10 (log_prob_threshold)
+                0.6,  # param_11 (no_speech_threshold)
+                "float16",  # param_12 (compute_type)
+                5.0,  # param_13 (best_of)
+                1.0,  # param_14 (patience)
+                True,  # param_15 (condition_on_previous_text)
+                0.5,  # param_16 (prompt_reset_on_temperature)
+                "Hello!!",  # param_17 (initial_prompt)
+                0.0,  # param_18 (temperature)
+                2.4,  # param_19 (compression_ratio_threshold)
+                1.0,  # param_20 (length_penalty)
+                1.0,  # param_21 (repetition_penalty)
+                0.0,  # param_22 (no_repeat_ngram_size)
+                "Hello!!",  # param_23 (prefix)
+                True,  # param_24 (suppress_blank)
+                "[-1]",  # param_25 (suppress_tokens)
+                1.0,  # param_26 (max_initial_timestamp)
+                False,  # param_27 (word_timestamps)
+                "'\"¿([{-",  # param_28 (prepend_punctuations)
+                "'.。,，!！?？:：\"])},、",  # param_29 (append_punctuations)
+                3.0,  # param_30 (max_new_tokens)
+                30.0,  # param_31 (chunk_length)
+                3.0,  # param_32 (hallucination_silence_threshold)
+                "Hello!!",  # param_33 (hotwords)
+                0.5,  # param_34 (language_detection_threshold)
+                1.0,  # param_35 (language_detection_segments)
+                24.0,  # param_36 (batch_size)
+                True,  # param_37 (offload_submodel)
+                True,  # param_38 (enable_silero_vad)
+                0.5,  # param_39 (speech_threshold)
+                250.0,  # param_40 (min_speech_duration)
+                9999.0,  # param_41 (max_speech_duration)
+                1000.0,  # param_42 (min_silence_duration)
+                2000.0,  # param_43 (speech_padding)
+                False,  # param_44 (enable_diarization)
+                "cpu",  # param_45 (device)
+                "",  # param_46 (huggingface_token)
+                True,  # param_47 (offload_submodel_2)
+                False,  # param_48 (enable_bgm_remover)
+                "UVR-MDX-NET-Inst_HQ_4",  # param_49 (bgm_model)
+                "cpu",  # param_50 (bgm_device)
+                256.0,  # param_51 (segment_size)
+                False,  # param_52 (save_separated_files)
+                True   # param_53 (offload_submodel_3)
+            ]
+        }
                 3,  # chunk_method
                 "int8",  # precision
                 3,  # chunk_size
