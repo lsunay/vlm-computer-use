@@ -686,9 +686,7 @@ def create_comprehensive_ui():
 
                     with gr.Column():
                         whisper_file_output = gr.Textbox(
-                            label="Transcription Result",
-                            lines=20,
-                            show_copy_button=True,
+                            label="Transcription Result", lines=20
                         )
 
                         whisper_file_download = gr.File(
@@ -744,9 +742,7 @@ def create_comprehensive_ui():
 
                     with gr.Column():
                         youtube_output = gr.Textbox(
-                            label="Transcription Result",
-                            lines=20,
-                            show_copy_button=True,
+                            label="Transcription Result", lines=20
                         )
 
                         youtube_download = gr.File(
@@ -806,9 +802,7 @@ def create_comprehensive_ui():
 
                     with gr.Column():
                         record_output = gr.Textbox(
-                            label="Transcription Result",
-                            lines=20,
-                            show_copy_button=True,
+                            label="Transcription Result", lines=20
                         )
 
                         record_download = gr.File(
@@ -972,7 +966,7 @@ if __name__ == "__main__":
     demo = create_comprehensive_ui()
     demo.launch(
         server_name="0.0.0.0",
-        server_port=int(os.getenv("APP_PORT", 7860)),
+        server_port=7860,
         share=False,
         show_error=True,
     )
