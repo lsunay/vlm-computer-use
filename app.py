@@ -24,8 +24,6 @@ load_dotenv()
 # ==================== WHISPER FUNCTIONS ====================
 
 
-
-
 def create_comprehensive_ui():
     """Create comprehensive Gradio UI with all features"""
     app = VLMAppV2()
@@ -482,7 +480,16 @@ def create_comprehensive_ui():
                     outputs=video_analysis,
                 )
 
-            # ==================== ANALYTICS TAB ====================
+                # ==================== ANALYTICS TAB ====================
+                with gr.Row():
+                    with gr.Column():
+                        stats_days = gr.Number(
+                            label="Days to look back", value=7, minimum=1, maximum=90
+                        )
+                        refresh_stats_btn = gr.Button(
+                            "📊 Refresh Stats", variant="secondary"
+                        )
+
                     with gr.Column():
                         stats_output = gr.Textbox(label="Usage Statistics", lines=15)
 
