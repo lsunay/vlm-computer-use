@@ -6,6 +6,9 @@ All 30+ features integrated
 import os
 import json
 import tempfile
+import base64
+import asyncio
+import requests
 import gradio as gr
 from typing import List, Tuple, Optional
 from dotenv import load_dotenv
@@ -16,6 +19,169 @@ from presets import get_presets_by_category, get_all_categories
 from database import db
 
 load_dotenv()
+
+
+# ==================== WHISPER FUNCTIONS ====================
+
+
+def get_whisper_models():
+    """Get available Whisper models from .env"""
+    models_str = os.getenv(
+        "WHISPER_MODELS",
+        "tiny.en,tiny,base.en,base,small.en,small,medium.en,medium,large-v1,large-v2,large-v3,large",
+    )
+    return models_str.split(",")
+
+
+def get_whisper_languages():
+    """Get available languages from .env"""
+    langs_str = os.getenv(
+        "WHISPER_LANGUAGES",
+        "auto,english,spanish,french,german,chinese,turkish,arabic,russian,japanese,korean",
+    )
+    return langs_str.split(",")
+
+
+def get_whisper_formats():
+    """Get available output formats from .env"""
+    formats_str = os.getenv("WHISPER_OUTPUT_FORMATS", "SRT,VTT,TXT,JSON,TSV,WebVTT,LRC")
+    return formats_str.split(",")
+
+
+async def transcribe_file_whisper(file_path, model, language, output_format):
+    """Transcribe audio/video file using Whisper-WebUI API"""
+    try:
+        base_url = os.getenv("WHISPER_WEBUI_BASE_URL", "http://192.168.1.12:7860")
+
+        # Prepare file for upload
+        with open(file_path, "rb") as f:
+            file_data = base64.b64encode(f.read()).decode()
+
+        # Prepare API payload (simplified version)
+        payload = {
+            "data": [
+                {"path": file_path, "meta": {"_type": "gradio.FileData"}},
+                language,  # language
+                False,  # translate
+                True,  # srt_timestamps
+                output_format,  # output_format
+                True,  # vad_filter
+                model,  # model
+                "english",  # initial_prompt_language
+                True,  # use_vad
+                3,  # vad_threshold
+                3,  # vad_method
+                3,  # chunk_method
+                "int8",  # precision
+                3,  # chunk_size
+                3,  # overlap
+                True,  # diarization
+                0,  # min_speakers
+                "Hello!!",  # initial_prompt
+                0,  # length_penalty
+                3,  # repetition_penalty
+                3,  # no_repeat_ngram_size
+                3,  # temperature
+                "Hello!!",  # prompt_reset_on_temperature
+                True,  # beam_search
+                "Hello!!",  # initial_prompt_b
+                3,  # compression_ratio_threshold
+                True,  # no_speech_threshold
+                "Hello!!",  # logprob_threshold
+                "Hello!!",  # condition_on_previous_text
+                3,  # prompt_reset_on_temperature_b
+                3,  # initial_prompt_reset
+                3,  # temperature_b
+                "Hello!!",  # repetition_penalty_b
+                3,  # no_repeat_ngram_size_b
+                "Hello!!",  # prompt_reset_on_temperature_c
+                3,  # temperature_c
+                "Hello!!",  # repetition_penalty_c
+                3,  # no_repeat_ngram_size_c
+                True,  # beam_search_b
+                True,  # beam_search_c
+                0,  # min_silence_duration_ms
+                3,  # max_silence_duration_ms
+                3,  # silence_threshold
+                3,  # step_duration_ms
+                3,  # buffer_threshold
+                True,  # keep_original
+                3,  # max_prompt_length
+                3,  # max_initial_prompt_length
+                3,  # max_new_tokens
+                "cpu",  # device
+                "Hello!!",  # whisper_type
+                True,  # use_dtw
+                True,  # dtw_batch_size
+                "UVR-MDX-NET-Inst_HQ_4",  # uvr_model
+                "cpu",  # uvr_device
+                3,  # uvr_window_size
+                True,  # uvr_aggression
+                True,  # uvr_output_format
+            ]
+        }
+
+        # Make API call
+        url = f"{base_url}/gradio_api/call/transcribe_file"
+        response = requests.post(url, json=payload, timeout=30)
+        response.raise_for_status()
+
+        event_id = response.json()["event_id"]
+
+        # Poll for results
+        result_url = f"{url}/{event_id}"
+        max_attempts = 60  # 5 minutes max
+        attempt = 0
+
+        while attempt < max_attempts:
+            result_response = requests.get(result_url, timeout=10)
+
+            if result_response.json().get("status") == "complete":
+                return result_response.json()["data"][0]  # Return transcription text
+
+            await asyncio.sleep(5)
+            attempt += 1
+
+        return "❌ Transcription timed out after 5 minutes"
+
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+async def transcribe_youtube_whisper(youtube_url, model, language, output_format):
+    """Transcribe YouTube video using Whisper-WebUI API"""
+    try:
+        base_url = os.getenv("WHISPER_WEBUI_BASE_URL", "http://192.168.1.12:7860")
+
+        # For YouTube, we need to use a different endpoint or prepare URL
+        payload = {
+            "data": [
+                youtube_url,  # YouTube URL
+                output_format,  # output_format
+                True,  # srt_timestamps
+                # ... similar parameters as file transcription
+            ]
+        }
+
+        # Note: YouTube transcription would need separate implementation
+        # For now, return a placeholder
+        return "🎵 YouTube transcription feature coming soon!"
+
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+async def record_and_transcribe_whisper(model, language, output_format):
+    """Record audio and transcribe using Whisper-WebUI API"""
+    try:
+        base_url = os.getenv("WHISPER_WEBUI_BASE_URL", "http://192.168.1.12:7860")
+
+        # For microphone recording, we'd need to handle audio upload
+        # This is a placeholder for the recording functionality
+        return "🎤 Audio recording and transcription feature coming soon!"
+
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
 
 def create_comprehensive_ui():
@@ -472,6 +638,191 @@ def create_comprehensive_ui():
                     fn=app.analyze_video,
                     inputs=[video_input, video_question, num_frames_slider],
                     outputs=video_analysis,
+                )
+
+            # ==================== WHISPER FILE TRANSCRIPTION TAB ====================
+            with gr.Tab("🎵 Whisper"):
+                gr.Markdown("### Transcribe Audio/Video Files with Whisper")
+
+                with gr.Row():
+                    with gr.Column():
+                        whisper_file_input = gr.File(
+                            label="Upload Audio/Video File",
+                            file_types=[
+                                ".mp3",
+                                ".wav",
+                                ".m4a",
+                                ".mp4",
+                                ".avi",
+                                ".mov",
+                                ".flac",
+                            ],
+                        )
+
+                        whisper_model_select = gr.Dropdown(
+                            choices=get_whisper_models(),
+                            value="tiny.en",
+                            label="Model",
+                            info="Select Whisper model (larger = better quality, slower)",
+                        )
+
+                        whisper_lang_select = gr.Dropdown(
+                            choices=get_whisper_languages(),
+                            value="auto",
+                            label="Language",
+                            info="Select language or 'auto' for automatic detection",
+                        )
+
+                        whisper_format_select = gr.Dropdown(
+                            choices=get_whisper_formats(),
+                            value="SRT",
+                            label="Output Format",
+                            info="Select subtitle/transcription format",
+                        )
+
+                        transcribe_file_btn = gr.Button(
+                            "🎵 Transcribe File", variant="primary", size="lg"
+                        )
+
+                    with gr.Column():
+                        whisper_file_output = gr.Textbox(
+                            label="Transcription Result",
+                            lines=20,
+                            show_copy_button=True,
+                        )
+
+                        whisper_file_download = gr.File(
+                            label="Download Result", interactive=False
+                        )
+
+                transcribe_file_btn.click(
+                    fn=transcribe_file_whisper,
+                    inputs=[
+                        whisper_file_input,
+                        whisper_model_select,
+                        whisper_lang_select,
+                        whisper_format_select,
+                    ],
+                    outputs=[whisper_file_output, whisper_file_download],
+                )
+
+            # ==================== WHISPER YOUTUBE TAB ====================
+            with gr.Tab("📺 YouTube"):
+                gr.Markdown("### Transcribe YouTube Videos with Whisper")
+
+                with gr.Row():
+                    with gr.Column():
+                        youtube_url_input = gr.Textbox(
+                            label="YouTube URL",
+                            placeholder="https://www.youtube.com/watch?v=...",
+                            info="Paste YouTube video URL here",
+                        )
+
+                        youtube_thumbnail = gr.Image(
+                            label="Video Thumbnail", visible=False
+                        )
+
+                        youtube_model_select = gr.Dropdown(
+                            choices=get_whisper_models(), value="tiny.en", label="Model"
+                        )
+
+                        youtube_lang_select = gr.Dropdown(
+                            choices=get_whisper_languages(),
+                            value="auto",
+                            label="Language",
+                        )
+
+                        youtube_format_select = gr.Dropdown(
+                            choices=get_whisper_formats(),
+                            value="SRT",
+                            label="Output Format",
+                        )
+
+                        transcribe_youtube_btn = gr.Button(
+                            "📺 Transcribe YouTube", variant="primary", size="lg"
+                        )
+
+                    with gr.Column():
+                        youtube_output = gr.Textbox(
+                            label="Transcription Result",
+                            lines=20,
+                            show_copy_button=True,
+                        )
+
+                        youtube_download = gr.File(
+                            label="Download Result", interactive=False
+                        )
+
+                # Show thumbnail when URL is entered
+                youtube_url_input.change(
+                    fn=lambda url: gr.Image(visible=bool(url)),
+                    inputs=youtube_url_input,
+                    outputs=youtube_thumbnail,
+                )
+
+                transcribe_youtube_btn.click(
+                    fn=transcribe_youtube_whisper,
+                    inputs=[
+                        youtube_url_input,
+                        youtube_model_select,
+                        youtube_lang_select,
+                        youtube_format_select,
+                    ],
+                    outputs=[youtube_output, youtube_download],
+                )
+
+            # ==================== WHISPER RECORD TAB ====================
+            with gr.Tab("🎤 Record"):
+                gr.Markdown("### Record and Transcribe Audio with Whisper")
+
+                with gr.Row():
+                    with gr.Column():
+                        record_audio = gr.Audio(
+                            label="Record Audio",
+                            sources=["microphone"],
+                            type="filepath",
+                            interactive=True,
+                        )
+
+                        record_model_select = gr.Dropdown(
+                            choices=get_whisper_models(), value="tiny.en", label="Model"
+                        )
+
+                        record_lang_select = gr.Dropdown(
+                            choices=get_whisper_languages(),
+                            value="auto",
+                            label="Language",
+                        )
+
+                        record_format_select = gr.Dropdown(
+                            choices=get_whisper_formats(),
+                            value="TXT",
+                            label="Output Format",
+                        )
+
+                        record_btn = gr.Button(
+                            "🎤 Record & Transcribe", variant="primary", size="lg"
+                        )
+
+                    with gr.Column():
+                        record_output = gr.Textbox(
+                            label="Transcription Result",
+                            lines=20,
+                            show_copy_button=True,
+                        )
+
+                        record_download = gr.File(
+                            label="Download Result", interactive=False
+                        )
+
+                record_btn.click(
+                    fn=record_and_transcribe_whisper,
+                    inputs=[
+                        record_model_select,
+                        record_lang_select,
+                        record_format_select,
+                    ],
+                    outputs=[record_output, record_download],
                 )
 
             # ==================== ANALYTICS TAB ====================
