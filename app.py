@@ -137,15 +137,20 @@ async def transcribe_file_whisper(file_path, model, language, output_format):
             result_response = requests.get(result_url, timeout=10)
 
             if result_response.json().get("status") == "complete":
-                return result_response.json()["data"][0]  # Return transcription text
+                transcription_text = result_response.json()["data"][0]
+                # For now, return transcription text and None for download file
+                # In future, we could save to a file and return the path
+                return transcription_text, None
 
             await asyncio.sleep(5)
             attempt += 1
 
-        return "❌ Transcription timed out after 5 minutes"
+        error_msg = "❌ Transcription timed out after 5 minutes"
+        return error_msg, None
 
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        error_msg = f"❌ Error: {str(e)}"
+        return error_msg, None
 
 
 async def transcribe_youtube_whisper(youtube_url, model, language, output_format):
@@ -165,10 +170,12 @@ async def transcribe_youtube_whisper(youtube_url, model, language, output_format
 
         # Note: YouTube transcription would need separate implementation
         # For now, return a placeholder
-        return "🎵 YouTube transcription feature coming soon!"
+        placeholder_msg = "🎵 YouTube transcription feature coming soon!"
+        return placeholder_msg, None
 
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        error_msg = f"❌ Error: {str(e)}"
+        return error_msg, None
 
 
 async def record_and_transcribe_whisper(model, language, output_format):
@@ -178,10 +185,12 @@ async def record_and_transcribe_whisper(model, language, output_format):
 
         # For microphone recording, we'd need to handle audio upload
         # This is a placeholder for the recording functionality
-        return "🎤 Audio recording and transcription feature coming soon!"
+        placeholder_msg = "🎤 Audio recording and transcription feature coming soon!"
+        return placeholder_msg, None
 
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        error_msg = f"❌ Error: {str(e)}"
+        return error_msg, None
 
 
 def create_comprehensive_ui():
