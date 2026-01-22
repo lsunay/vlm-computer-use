@@ -38,6 +38,10 @@ A comprehensive vision-language model application with chat, code generation, ba
 - 🎨 **Gradio 6.x Compatibility** - Fixed chat message formats and constructor parameters
 - 🗄️ **Database Fixes** - Resolved SQLAlchemy metadata naming conflicts
 - 🚀 **Container Ready** - Simplified docker-compose without Ollama dependency
+- 🎵 **Whisper Integration** - Audio/video transcription with Whisper-WebUI API
+- 📺 **YouTube Transcription** - Direct YouTube video transcription support
+- 🎤 **Audio Recording** - Built-in microphone recording and transcription
+- ⚙️ **Enhanced Configuration** - Expanded .env with Whisper model/language/format options
 
 ---
 
@@ -77,7 +81,7 @@ docker-compose up -d
 
 # Or build and run manually
 docker build -t vlm-demo .
-docker run -p 7860:7860 --env-file .env vlm-demo
+docker run -p 7861:7860 --env-file .env vlm-demo
 ```
 
 ---
@@ -94,6 +98,9 @@ docker run -p 7860:7860 --env-file .env vlm-demo
 | **Image Comparison** | Compare 2-10 images with similarity scores |
 | **OCR & Tables** | Extract text (multi-language) and tables from images |
 | **Video Analysis** | Analyze videos via frame extraction (4-16 frames) |
+| **🎵 Whisper Transcription** | Transcribe audio/video files with multiple Whisper models |
+| **📺 YouTube Transcription** | Direct transcription of YouTube videos |
+| **🎤 Audio Recording** | Record and transcribe audio with built-in microphone |
 | **Preset Prompts** | 70+ templates for quick actions |
 | **Cost Tracking** | Real-time token counting and cost calculation |
 | **Chat History** | Persistent conversations with search and export |
