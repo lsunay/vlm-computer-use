@@ -1,4 +1,5 @@
-FROM python:3.11-slim-bookworm
+# Stage 1: Build dependencies
+FROM python:3.11-slim-bookworm AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -16,6 +17,9 @@ WORKDIR /app
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 2: Final application image
+FROM base AS final
 
 # Copy application files
 COPY . .
