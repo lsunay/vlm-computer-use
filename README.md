@@ -25,7 +25,19 @@ A comprehensive vision-language model application with chat, code generation, ba
 - 🌐 **REST API** - FastAPI endpoints
 - 🔧 **Code Refinement** - Iteratively improve generated code
 
-[See all features →](FEATURES.md)
+ [See all features →](FEATURES.md)
+
+---
+
+## 🆕 Latest Improvements (2025)
+
+**Recent enhancements for better compatibility and performance:**
+
+- 🐳 **AMD GPU Support** - Removed NVIDIA dependencies, CPU-only PyTorch for AMD compatibility
+- 🔧 **Docker Optimization** - Updated to Python 3.11-slim-bookworm, port 7861 for external access
+- 🎨 **Gradio 6.x Compatibility** - Fixed chat message formats and constructor parameters
+- 🗄️ **Database Fixes** - Resolved SQLAlchemy metadata naming conflicts
+- 🚀 **Container Ready** - Simplified docker-compose without Ollama dependency
 
 ---
 
