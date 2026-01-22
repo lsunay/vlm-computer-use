@@ -57,10 +57,12 @@ async def transcribe_file_whisper(file_path, model, language, output_format):
         with open(file_path, "rb") as f:
             file_data = base64.b64encode(f.read()).decode()
 
-        # Prepare API payload (simplified version)
+        # Prepare API payload (matching Whisper-WebUI format)
         payload = {
             "data": [
-                {"path": file_path, "meta": {"_type": "gradio.FileData"}},
+                [
+                    {"path": file_path, "meta": {"_type": "gradio.FileData"}}
+                ],  # File in list
                 language,  # language
                 False,  # translate
                 True,  # srt_timestamps
