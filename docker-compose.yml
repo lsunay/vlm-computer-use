@@ -2,7 +2,7 @@ services:
   vlm-demo:
     build: .
     ports:
-      - "7861"
+      - "7861:8080"
     env_file:
       - .env
     volumes:
