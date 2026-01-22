@@ -39,8 +39,7 @@ def create_comprehensive_ui():
     }
     """
 
-    with gr.Blocks(title="VLM Demo - Complete Edition", theme=gr.themes.Soft(), css=custom_css) as demo:
-
+    with gr.Blocks(title="VLM Demo - Complete Edition") as demo:
         gr.Markdown("""
         # 🎨 Vision Language Model Demo - Complete Edition
         ### 30+ Features | Multi-Provider | Privacy-First | Production-Ready
@@ -53,7 +52,6 @@ def create_comprehensive_ui():
         current_model = gr.State("")
 
         with gr.Tabs() as main_tabs:
-
             # ==================== CONFIGURATION TAB ====================
             with gr.Tab("⚙️ Configuration"):
                 gr.Markdown("### Configure Your VLM Provider")
@@ -64,32 +62,36 @@ def create_comprehensive_ui():
                             choices=["openai", "anthropic", "ollama", "custom"],
                             value=os.getenv("DEFAULT_PROVIDER", "openai"),
                             label="Provider",
-                            info="Select your LLM provider"
+                            info="Select your LLM provider",
                         )
 
                         api_key_input = gr.Textbox(
                             label="API Key",
                             type="password",
                             placeholder="Leave empty to use .env",
-                            info="Your API key (optional for Ollama)"
+                            info="Your API key (optional for Ollama)",
                         )
 
                         base_url_input = gr.Textbox(
                             label="Base URL (Optional)",
                             placeholder="e.g., http://localhost:11434/v1",
-                            info="Custom endpoint URL"
+                            info="Custom endpoint URL",
                         )
 
                         model_input = gr.Textbox(
                             label="Model Name (Optional)",
                             placeholder="e.g., gpt-4o, claude-3-5-sonnet-20241022",
-                            info="Leave empty for defaults"
+                            info="Leave empty for defaults",
                         )
 
-                        init_btn = gr.Button("🚀 Initialize Provider", variant="primary", size="lg")
+                        init_btn = gr.Button(
+                            "🚀 Initialize Provider", variant="primary", size="lg"
+                        )
 
                     with gr.Column(scale=1):
-                        status_box = gr.Textbox(label="Status", interactive=False, lines=3)
+                        status_box = gr.Textbox(
+                            label="Status", interactive=False, lines=3
+                        )
 
                         gr.Markdown("""
                         ### Quick Start Examples
@@ -112,8 +114,13 @@ def create_comprehensive_ui():
 
                 init_btn.click(
                     fn=app.initialize_provider,
-                    inputs=[provider_select, api_key_input, base_url_input, model_input],
-                    outputs=status_box
+                    inputs=[
+                        provider_select,
+                        api_key_input,
+                        base_url_input,
+                        model_input,
+                    ],
+                    outputs=status_box,
                 )
 
             # ==================== CHAT TAB ====================
@@ -125,14 +132,14 @@ def create_comprehensive_ui():
                         chat_mode = gr.Radio(
                             choices=["chat", "analysis", "thinking"],
                             value="chat",
-                            label="Conversation Mode"
+                            label="Conversation Mode",
                         )
 
                         chat_images = gr.File(
                             label="Upload Images",
                             file_count="multiple",
                             type="filepath",
-                            file_types=["image"]
+                            file_types=["image"],
                         )
 
                         save_chat_db = gr.Checkbox(label="Save to History", value=True)
@@ -144,67 +151,67 @@ def create_comprehensive_ui():
                         export_format = gr.Dropdown(
                             choices=["markdown", "json", "pdf"],
                             value="markdown",
-                            label="Export Format"
+                            label="Export Format",
                         )
 
                         export_file = gr.File(label="Download Export")
 
                     with gr.Column(scale=2):
                         chatbot = gr.Chatbot(label="Conversation", height=500)
-                        cost_display = gr.Textbox(label="💰 Cost Tracking", interactive=False)
+                        cost_display = gr.Textbox(
+                            label="💰 Cost Tracking", interactive=False
+                        )
                         msg_input = gr.Textbox(
                             label="Message",
                             placeholder="Ask about the images...",
-                            lines=3
+                            lines=3,
                         )
                         with gr.Row():
                             send_btn = gr.Button("📤 Send", variant="primary", scale=3)
-                            preset_btn = gr.Button("⚡ Use Preset", variant="secondary", scale=1)
+                            preset_btn = gr.Button(
+                                "⚡ Use Preset", variant="secondary", scale=1
+                            )
 
                 # Preset prompts panel
                 with gr.Accordion("⚡ Preset Prompts", open=False):
                     preset_category = gr.Dropdown(
                         choices=get_all_categories(),
                         value="General Analysis",
-                        label="Category"
+                        label="Category",
                     )
-                    preset_buttons = gr.Radio(
-                        choices=[],
-                        label="Quick Actions"
-                    )
+                    preset_buttons = gr.Radio(choices=[], label="Quick Actions")
 
                     def update_presets(category):
                         presets = get_presets_by_category(category)
-                        return gr.Radio(choices=[f"{p['icon']} {p['name']}" for p in presets])
+                        return gr.Radio(
+                            choices=[f"{p['icon']} {p['name']}" for p in presets]
+                        )
 
                     preset_category.change(
                         fn=update_presets,
                         inputs=preset_category,
-                        outputs=preset_buttons
+                        outputs=preset_buttons,
                     )
 
                 # Event handlers
                 send_btn.click(
                     fn=app.chat_with_images,
                     inputs=[msg_input, chat_images, chat_mode, chatbot, save_chat_db],
-                    outputs=[chatbot, msg_input, cost_display]
+                    outputs=[chatbot, msg_input, cost_display],
                 )
 
                 msg_input.submit(
                     fn=app.chat_with_images,
                     inputs=[msg_input, chat_images, chat_mode, chatbot, save_chat_db],
-                    outputs=[chatbot, msg_input, cost_display]
+                    outputs=[chatbot, msg_input, cost_display],
                 )
 
-                clear_btn.click(
-                    fn=app.clear_chat,
-                    outputs=[chatbot, cost_display]
-                )
+                clear_btn.click(fn=app.clear_chat, outputs=[chatbot, cost_display])
 
                 export_btn.click(
                     fn=app.export_chat_history,
                     inputs=export_format,
-                    outputs=export_file
+                    outputs=export_file,
                 )
 
             # ==================== CODE GENERATION TAB ====================
@@ -217,37 +224,41 @@ def create_comprehensive_ui():
                             label="Upload Screenshots",
                             file_count="multiple",
                             type="filepath",
-                            file_types=["image"]
+                            file_types=["image"],
                         )
 
                         code_framework = gr.Dropdown(
                             choices=["html", "react", "vue", "tailwind", "bootstrap"],
                             value="html",
-                            label="Framework"
+                            label="Framework",
                         )
 
                         code_instructions = gr.Textbox(
                             label="Additional Instructions",
                             placeholder="e.g., Add dark mode, make it responsive...",
-                            lines=3
+                            lines=3,
                         )
 
                         with gr.Row():
-                            generate_code_btn = gr.Button("✨ Generate Code", variant="primary")
-                            save_code_db = gr.Checkbox(label="Save to Database", value=True)
+                            generate_code_btn = gr.Button(
+                                "✨ Generate Code", variant="primary"
+                            )
+                            save_code_db = gr.Checkbox(
+                                label="Save to Database", value=True
+                            )
 
                         code_status = gr.Textbox(label="Status", interactive=False)
 
                     with gr.Column(scale=1):
                         code_output = gr.Code(
-                            label="Generated Code",
-                            language="html",
-                            lines=20
+                            label="Generated Code", language="html", lines=20
                         )
 
                         with gr.Row():
                             copy_code_btn = gr.Button("📋 Copy", variant="secondary")
-                            download_code_btn = gr.Button("💾 Download", variant="secondary")
+                            download_code_btn = gr.Button(
+                                "💾 Download", variant="secondary"
+                            )
 
                         code_file = gr.File(label="Download Code")
 
@@ -256,14 +267,14 @@ def create_comprehensive_ui():
                     refinement_request = gr.Textbox(
                         label="Refinement Request",
                         placeholder="e.g., Add animations, improve accessibility, fix alignment...",
-                        lines=2
+                        lines=2,
                     )
                     refine_btn = gr.Button("♻️ Refine Code", variant="primary")
 
                     refine_btn.click(
                         fn=app.refine_code,
                         inputs=[code_output, refinement_request, code_framework],
-                        outputs=[code_output, code_status]
+                        outputs=[code_output, code_status],
                     )
 
                 # Live preview section
@@ -276,15 +287,18 @@ def create_comprehensive_ui():
                         return "<p>Generate code to see preview</p>"
 
                     code_output.change(
-                        fn=update_preview,
-                        inputs=code_output,
-                        outputs=preview_html
+                        fn=update_preview, inputs=code_output, outputs=preview_html
                     )
 
                 generate_code_btn.click(
                     fn=app.generate_code_from_screenshot,
-                    inputs=[code_images, code_framework, code_instructions, save_code_db],
-                    outputs=[code_output, code_status]
+                    inputs=[
+                        code_images,
+                        code_framework,
+                        code_instructions,
+                        save_code_db,
+                    ],
+                    outputs=[code_output, code_status],
                 )
 
             # ==================== BATCH PROCESSING TAB ====================
@@ -297,25 +311,29 @@ def create_comprehensive_ui():
                             label="Upload Multiple Images",
                             file_count="multiple",
                             type="filepath",
-                            file_types=["image"]
+                            file_types=["image"],
                         )
 
                         batch_prompt = gr.Textbox(
                             label="Prompt for All Images",
                             placeholder="This prompt will be applied to each image...",
-                            lines=3
+                            lines=3,
                         )
 
                         batch_export_format = gr.Dropdown(
                             choices=["csv", "json", "txt"],
                             value="csv",
-                            label="Export Format"
+                            label="Export Format",
                         )
 
-                        batch_process_btn = gr.Button("⚡ Process Batch", variant="primary", size="lg")
+                        batch_process_btn = gr.Button(
+                            "⚡ Process Batch", variant="primary", size="lg"
+                        )
 
                     with gr.Column():
-                        batch_status = gr.Textbox(label="Status", interactive=False, lines=3)
+                        batch_status = gr.Textbox(
+                            label="Status", interactive=False, lines=3
+                        )
                         batch_results = gr.File(label="Download Results")
 
                         gr.Markdown("""
@@ -330,7 +348,7 @@ def create_comprehensive_ui():
                 batch_process_btn.click(
                     fn=app.batch_process_images,
                     inputs=[batch_images, batch_prompt, batch_export_format],
-                    outputs=[batch_results, batch_status]
+                    outputs=[batch_results, batch_status],
                 )
 
             # ==================== IMAGE COMPARISON TAB ====================
@@ -343,28 +361,29 @@ def create_comprehensive_ui():
                             label="Upload 2+ Images to Compare",
                             file_count="multiple",
                             type="filepath",
-                            file_types=["image"]
+                            file_types=["image"],
                         )
 
                         comparison_prompt = gr.Textbox(
                             label="Comparison Prompt (Optional)",
                             placeholder="Leave empty for default comparison...",
                             lines=3,
-                            value="Compare these images in detail. Analyze differences, similarities, and which is better for what purpose."
+                            value="Compare these images in detail. Analyze differences, similarities, and which is better for what purpose.",
                         )
 
-                        compare_btn = gr.Button("🔍 Compare", variant="primary", size="lg")
+                        compare_btn = gr.Button(
+                            "🔍 Compare", variant="primary", size="lg"
+                        )
 
                     with gr.Column():
                         comparison_result = gr.Textbox(
-                            label="Comparison Analysis",
-                            lines=20
+                            label="Comparison Analysis", lines=20
                         )
 
                 compare_btn.click(
                     fn=app.compare_images,
                     inputs=[comparison_images, comparison_prompt],
-                    outputs=comparison_result
+                    outputs=comparison_result,
                 )
 
             # ==================== OCR & DOCUMENTS TAB ====================
@@ -375,37 +394,49 @@ def create_comprehensive_ui():
                     with gr.Tab("Text Extraction"):
                         with gr.Row():
                             with gr.Column():
-                                ocr_image = gr.Image(label="Upload Image", type="filepath")
+                                ocr_image = gr.Image(
+                                    label="Upload Image", type="filepath"
+                                )
                                 ocr_lang = gr.Dropdown(
                                     choices=["eng", "spa", "fra", "deu", "chi_sim"],
                                     value="eng",
-                                    label="Language"
+                                    label="Language",
                                 )
-                                extract_text_btn = gr.Button("📝 Extract Text", variant="primary")
+                                extract_text_btn = gr.Button(
+                                    "📝 Extract Text", variant="primary"
+                                )
 
                             with gr.Column():
-                                extracted_text = gr.Textbox(label="Extracted Text", lines=15)
+                                extracted_text = gr.Textbox(
+                                    label="Extracted Text", lines=15
+                                )
 
                         extract_text_btn.click(
                             fn=app.extract_text_ocr,
                             inputs=[ocr_image, ocr_lang],
-                            outputs=extracted_text
+                            outputs=extracted_text,
                         )
 
                     with gr.Tab("Table Extraction"):
                         with gr.Row():
                             with gr.Column():
-                                table_image = gr.Image(label="Upload Table Image", type="filepath")
-                                extract_table_btn = gr.Button("📊 Extract Table", variant="primary")
+                                table_image = gr.Image(
+                                    label="Upload Table Image", type="filepath"
+                                )
+                                extract_table_btn = gr.Button(
+                                    "📊 Extract Table", variant="primary"
+                                )
 
                             with gr.Column():
                                 table_output = gr.Dataframe(label="Extracted Table")
-                                table_status = gr.Textbox(label="Status", interactive=False)
+                                table_status = gr.Textbox(
+                                    label="Status", interactive=False
+                                )
 
                         extract_table_btn.click(
                             fn=app.extract_table,
                             inputs=table_image,
-                            outputs=[table_output, table_status]
+                            outputs=[table_output, table_status],
                         )
 
             # ==================== VIDEO ANALYSIS TAB ====================
@@ -419,7 +450,7 @@ def create_comprehensive_ui():
                         video_question = gr.Textbox(
                             label="Question",
                             placeholder="What would you like to know about this video?",
-                            lines=3
+                            lines=3,
                         )
 
                         num_frames_slider = gr.Slider(
@@ -427,10 +458,12 @@ def create_comprehensive_ui():
                             maximum=16,
                             value=8,
                             step=1,
-                            label="Frames to Extract"
+                            label="Frames to Extract",
                         )
 
-                        analyze_video_btn = gr.Button("🎬 Analyze Video", variant="primary", size="lg")
+                        analyze_video_btn = gr.Button(
+                            "🎬 Analyze Video", variant="primary", size="lg"
+                        )
 
                     with gr.Column():
                         video_analysis = gr.Textbox(label="Analysis", lines=20)
@@ -438,7 +471,7 @@ def create_comprehensive_ui():
                 analyze_video_btn.click(
                     fn=app.analyze_video,
                     inputs=[video_input, video_question, num_frames_slider],
-                    outputs=video_analysis
+                    outputs=video_analysis,
                 )
 
             # ==================== ANALYTICS TAB ====================
@@ -452,18 +485,18 @@ def create_comprehensive_ui():
                             maximum=90,
                             value=30,
                             step=1,
-                            label="Days to Analyze"
+                            label="Days to Analyze",
                         )
 
-                        refresh_stats_btn = gr.Button("🔄 Refresh Stats", variant="primary")
+                        refresh_stats_btn = gr.Button(
+                            "🔄 Refresh Stats", variant="primary"
+                        )
 
                     with gr.Column():
                         stats_output = gr.Textbox(label="Usage Statistics", lines=15)
 
                 refresh_stats_btn.click(
-                    fn=app.get_usage_stats,
-                    inputs=stats_days,
-                    outputs=stats_output
+                    fn=app.get_usage_stats, inputs=stats_days, outputs=stats_output
                 )
 
                 # Session history
@@ -472,11 +505,14 @@ def create_comprehensive_ui():
 
                     def list_sessions():
                         sessions = db.list_chat_sessions(limit=50)
-                        return [[s['id'], s['title'], s['created_at'], s['message_count']] for s in sessions]
+                        return [
+                            [s["id"], s["title"], s["created_at"], s["message_count"]]
+                            for s in sessions
+                        ]
 
                     history_table = gr.Dataframe(
                         headers=["ID", "Title", "Created", "Messages"],
-                        label="Chat Sessions"
+                        label="Chat Sessions",
                     )
 
                     with gr.Row():
@@ -486,7 +522,7 @@ def create_comprehensive_ui():
                     load_session_btn.click(
                         fn=app.load_chat_session,
                         inputs=load_session_id,
-                        outputs=[chatbot, status_box]
+                        outputs=[chatbot, status_box],
                     )
 
             # ==================== HELP & DOCS TAB ====================
@@ -587,5 +623,5 @@ if __name__ == "__main__":
         server_name="0.0.0.0",
         server_port=int(os.getenv("APP_PORT", 7860)),
         share=False,
-        show_error=True
+        show_error=True,
     )

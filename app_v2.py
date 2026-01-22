@@ -14,14 +14,31 @@ from datetime import datetime
 import pandas as pd
 
 from providers import ProviderFactory, VLMProvider
-from utils import extract_frames_from_video, resize_image, validate_image, get_system_prompt
+from utils import (
+    extract_frames_from_video,
+    resize_image,
+    validate_image,
+    get_system_prompt,
+)
 from advanced_utils import (
-    BatchProcessor, OCRProcessor, CodeFormatter, ImageAnnotator,
-    estimate_image_tokens, count_tokens, calculate_cost,
-    export_chat_to_markdown, export_chat_to_pdf, compare_images_similarity
+    BatchProcessor,
+    OCRProcessor,
+    CodeFormatter,
+    ImageAnnotator,
+    estimate_image_tokens,
+    count_tokens,
+    calculate_cost,
+    export_chat_to_markdown,
+    export_chat_to_pdf,
+    compare_images_similarity,
 )
 from database import db
-from presets import get_presets_by_category, get_all_categories, get_code_template, SYSTEM_PROMPTS
+from presets import (
+    get_presets_by_category,
+    get_all_categories,
+    get_code_template,
+    SYSTEM_PROMPTS,
+)
 
 # Load environment variables
 load_dotenv()
@@ -42,11 +59,7 @@ class VLMAppV2:
     # ==================== CONFIGURATION ====================
 
     def initialize_provider(
-        self,
-        provider_type: str,
-        api_key: str,
-        base_url: str,
-        model: str
+        self, provider_type: str, api_key: str, base_url: str, model: str
     ) -> str:
         """Initialize the selected provider"""
         try:
@@ -58,7 +71,7 @@ class VLMAppV2:
                 provider_type=provider_type,
                 api_key=api_key,
                 base_url=base_url,
-                model=model
+                model=model,
             )
             self.provider_name = provider_type
             self.model_name = model or "default"
@@ -75,7 +88,7 @@ class VLMAppV2:
         images: List[str],
         mode: str,
         history: List[Tuple[str, str]],
-        save_to_db: bool = True
+        save_to_db: bool = True,
     ) -> Tuple[List[Tuple[str, str]], str, str]:
         """Enhanced chat with cost tracking"""
         if not self.provider:
@@ -99,13 +112,12 @@ class VLMAppV2:
                     title=message[:50] if message else "Image Chat",
                     provider=self.provider_name,
                     model=self.model_name,
-                    mode=mode
+                    mode=mode,
                 )
 
             # Create message
             user_message = self.provider.format_message_with_images(
-                text=message,
-                image_paths=image_paths
+                text=message, image_paths=image_paths
             )
 
             # Calculate input tokens
@@ -118,30 +130,41 @@ class VLMAppV2:
             # Get response
             system_prompt = get_system_prompt(mode)
             response = self.provider.chat(
-                messages=self.chat_history,
-                system_prompt=system_prompt
+                messages=self.chat_history, system_prompt=system_prompt
             )
 
             # Calculate cost
             output_tokens = count_tokens(response, self.model_name)
             cost = calculate_cost(input_tokens, output_tokens, self.model_name)
             self.total_cost += cost
-            self.total_tokens += (input_tokens + output_tokens)
+            self.total_tokens += input_tokens + output_tokens
 
             # Add to history
-            self.chat_history.append({
-                "role": "assistant",
-                "content": response
-            })
+            self.chat_history.append({"role": "assistant", "content": response})
 
             # Save to database
             if save_to_db and self.current_session_id:
-                db.add_message(self.current_session_id, "user", message, image_paths, input_tokens, 0)
-                db.add_message(self.current_session_id, "assistant", response, None, output_tokens, cost)
+                db.add_message(
+                    self.current_session_id,
+                    "user",
+                    message,
+                    image_paths,
+                    input_tokens,
+                    0,
+                )
+                db.add_message(
+                    self.current_session_id,
+                    "assistant",
+                    response,
+                    None,
+                    output_tokens,
+                    cost,
+                )
 
-            # Format for display
+            # Format for display (Gradio 6.x compatible)
             display_msg = message if message else "[Image(s) uploaded]"
-            history.append((display_msg, response))
+            history.append({"role": "user", "content": display_msg})
+            history.append({"role": "assistant", "content": response})
 
             # Cost info
             cost_info = f"💰 Cost: ${cost:.4f} | Tokens: {input_tokens + output_tokens} | Total: ${self.total_cost:.4f}"
@@ -166,19 +189,20 @@ class VLMAppV2:
             history = []
 
             for msg in messages:
-                if msg['role'] == 'user':
-                    self.chat_history.append({
-                        "role": "user",
-                        "content": [{"type": "text", "text": msg['content']}]
-                    })
-                    history.append((msg['content'], ""))
+                if msg["role"] == "user":
+                    self.chat_history.append(
+                        {
+                            "role": "user",
+                            "content": [{"type": "text", "text": msg["content"]}],
+                        }
+                    )
+                    history.append((msg["content"], ""))
                 else:
-                    self.chat_history.append({
-                        "role": "assistant",
-                        "content": msg['content']
-                    })
+                    self.chat_history.append(
+                        {"role": "assistant", "content": msg["content"]}
+                    )
                     if history:
-                        history[-1] = (history[-1][0], msg['content'])
+                        history[-1] = (history[-1][0], msg["content"])
 
             self.current_session_id = session_id
             return history, "✅ Session loaded!"
@@ -202,7 +226,7 @@ class VLMAppV2:
                 export_chat_to_pdf(messages, output_path)
             elif format_type == "json":
                 output_path = os.path.join(temp_dir, "chat_export.json")
-                with open(output_path, 'w') as f:
+                with open(output_path, "w") as f:
                     json.dump(messages, f, indent=2, default=str)
             else:
                 return "⚠️ Invalid format"
@@ -218,7 +242,7 @@ class VLMAppV2:
         images: List[str],
         framework: str,
         instructions: str,
-        save_to_db: bool = True
+        save_to_db: bool = True,
     ) -> Tuple[str, str]:
         """Enhanced code generation with templates"""
         if not self.provider:
@@ -252,12 +276,13 @@ class VLMAppV2:
 
             # Create message
             message = self.provider.format_message_with_images(
-                text=base_prompt,
-                image_paths=image_paths
+                text=base_prompt, image_paths=image_paths
             )
 
             # Get system prompt
-            system_prompt = SYSTEM_PROMPTS["code_generation"].get(framework, SYSTEM_PROMPTS["code_generation"]["html"])
+            system_prompt = SYSTEM_PROMPTS["code_generation"].get(
+                framework, SYSTEM_PROMPTS["code_generation"]["html"]
+            )
 
             # Generate
             code = self.provider.chat(messages=[message], system_prompt=system_prompt)
@@ -280,7 +305,7 @@ class VLMAppV2:
                     provider=self.provider_name,
                     model=self.model_name,
                     tokens=input_tokens + output_tokens,
-                    cost=cost
+                    cost=cost,
                 )
 
             info = f"✅ Generated {framework} code | Cost: ${cost:.4f}"
@@ -289,20 +314,21 @@ class VLMAppV2:
         except Exception as e:
             return "", f"❌ Error: {str(e)}"
 
-    def refine_code(self, current_code: str, refinement_request: str, framework: str) -> Tuple[str, str]:
+    def refine_code(
+        self, current_code: str, refinement_request: str, framework: str
+    ) -> Tuple[str, str]:
         """Iteratively refine generated code"""
         if not self.provider:
             return current_code, "⚠️ Please configure provider first!"
 
         try:
-            prompt = f"Here is the current code:\n\n```{framework}\n{current_code}\n```\n\n"
+            prompt = (
+                f"Here is the current code:\n\n```{framework}\n{current_code}\n```\n\n"
+            )
             prompt += f"Please make the following changes:\n{refinement_request}\n\n"
             prompt += "Return ONLY the updated code, no explanations."
 
-            message = {
-                "role": "user",
-                "content": prompt
-            }
+            message = {"role": "user", "content": prompt}
 
             response = self.provider.chat(messages=[message])
 
@@ -313,10 +339,7 @@ class VLMAppV2:
     # ==================== BATCH PROCESSING ====================
 
     def batch_process_images(
-        self,
-        images: List[str],
-        prompt: str,
-        export_format: str
+        self, images: List[str], prompt: str, export_format: str
     ) -> Tuple[str, str]:
         """Batch process multiple images"""
         if not self.provider:
@@ -341,13 +364,13 @@ class VLMAppV2:
             else:
                 # Create text summary
                 output_path = os.path.join(temp_dir, "batch_results.txt")
-                with open(output_path, 'w') as f:
+                with open(output_path, "w") as f:
                     for r in results:
                         f.write(f"Image: {os.path.basename(r['image'])}\n")
                         f.write(f"Result: {r['result']}\n")
                         f.write("-" * 80 + "\n\n")
 
-            success_count = sum(1 for r in results if r['success'])
+            success_count = sum(1 for r in results if r["success"])
             info = f"✅ Processed {success_count}/{len(results)} images successfully"
 
             return output_path, info
@@ -357,11 +380,7 @@ class VLMAppV2:
 
     # ==================== IMAGE COMPARISON ====================
 
-    def compare_images(
-        self,
-        images: List[str],
-        comparison_prompt: str
-    ) -> str:
+    def compare_images(self, images: List[str], comparison_prompt: str) -> str:
         """Compare multiple images"""
         if not self.provider:
             return "⚠️ Please configure provider first!"
@@ -378,15 +397,19 @@ class VLMAppV2:
                     image_paths.append(resized)
 
             # Create message
-            prompt = comparison_prompt or "Compare these images in detail. Analyze differences, similarities, strengths and weaknesses of each."
+            prompt = (
+                comparison_prompt
+                or "Compare these images in detail. Analyze differences, similarities, strengths and weaknesses of each."
+            )
             message = self.provider.format_message_with_images(
-                text=prompt,
-                image_paths=image_paths
+                text=prompt, image_paths=image_paths
             )
 
             # Get response
             system_prompt = get_system_prompt("analysis")
-            response = self.provider.chat(messages=[message], system_prompt=system_prompt)
+            response = self.provider.chat(
+                messages=[message], system_prompt=system_prompt
+            )
 
             # Add similarity scores if exactly 2 images
             if len(image_paths) == 2:
@@ -430,12 +453,7 @@ class VLMAppV2:
 
     # ==================== VIDEO ANALYSIS ====================
 
-    def analyze_video(
-        self,
-        video_path: str,
-        question: str,
-        num_frames: int
-    ) -> str:
+    def analyze_video(self, video_path: str, question: str, num_frames: int) -> str:
         """Enhanced video analysis"""
         if not self.provider:
             return "⚠️ Please configure provider first!"
@@ -448,15 +466,19 @@ class VLMAppV2:
             frames = extract_frames_from_video(video_path, num_frames)
 
             # Create message
-            prompt = question or "Analyze this video and describe what you see. Include key moments, actions, and overall narrative."
+            prompt = (
+                question
+                or "Analyze this video and describe what you see. Include key moments, actions, and overall narrative."
+            )
             message = self.provider.format_message_with_images(
-                text=prompt,
-                image_paths=frames
+                text=prompt, image_paths=frames
             )
 
             # Get response
             system_prompt = get_system_prompt("analysis")
-            response = self.provider.chat(messages=[message], system_prompt=system_prompt)
+            response = self.provider.chat(
+                messages=[message], system_prompt=system_prompt
+            )
 
             return response
 
@@ -466,10 +488,7 @@ class VLMAppV2:
     # ==================== MODEL COMPARISON ====================
 
     def compare_models(
-        self,
-        message: str,
-        images: List[str],
-        models: List[Dict[str, str]]
+        self, message: str, images: List[str], models: List[Dict[str, str]]
     ) -> str:
         """Compare responses from multiple models"""
         if not message and not images:
@@ -481,33 +500,39 @@ class VLMAppV2:
             try:
                 # Create provider
                 provider = ProviderFactory.create_provider(
-                    provider_type=model_config['provider'],
-                    api_key=model_config.get('api_key'),
-                    base_url=model_config.get('base_url'),
-                    model=model_config.get('model')
+                    provider_type=model_config["provider"],
+                    api_key=model_config.get("api_key"),
+                    base_url=model_config.get("base_url"),
+                    model=model_config.get("model"),
                 )
 
                 # Prepare message
                 if images:
-                    msg = provider.format_message_with_images(text=message, image_paths=images)
+                    msg = provider.format_message_with_images(
+                        text=message, image_paths=images
+                    )
                 else:
                     msg = {"role": "user", "content": message}
 
                 # Get response
                 response = provider.chat(messages=[msg])
 
-                results.append({
-                    "model": f"{model_config['provider']} - {model_config.get('model', 'default')}",
-                    "response": response,
-                    "success": True
-                })
+                results.append(
+                    {
+                        "model": f"{model_config['provider']} - {model_config.get('model', 'default')}",
+                        "response": response,
+                        "success": True,
+                    }
+                )
 
             except Exception as e:
-                results.append({
-                    "model": f"{model_config['provider']} - {model_config.get('model', 'default')}",
-                    "response": f"Error: {str(e)}",
-                    "success": False
-                })
+                results.append(
+                    {
+                        "model": f"{model_config['provider']} - {model_config.get('model', 'default')}",
+                        "response": f"Error: {str(e)}",
+                        "success": False,
+                    }
+                )
 
         # Format comparison
         output = "# Model Comparison Results\n\n"
@@ -520,7 +545,9 @@ class VLMAppV2:
 
     # ==================== PRESET PROMPTS ====================
 
-    def apply_preset(self, preset_prompt: str, images: List[str]) -> Tuple[List[Tuple[str, str]], str, str]:
+    def apply_preset(
+        self, preset_prompt: str, images: List[str]
+    ) -> Tuple[List[Tuple[str, str]], str, str]:
         """Apply preset prompt"""
         return self.chat_with_images(preset_prompt, images, "analysis", [])
 
