@@ -61,7 +61,10 @@ async def transcribe_file_whisper(file_path, model, language, output_format):
         payload = {
             "data": [
                 [
-                    {"path": f"data:video/mp4;base64,{file_data}", "meta": {"_type": "gradio.FileData"}}
+                    {
+                        "path": f"data:video/mp4;base64,{file_data}",
+                        "meta": {"_type": "gradio.FileData"},
+                    }
                 ],  # files
                 "",  # input_folder_path
                 False,  # include_subdirectory
@@ -115,56 +118,7 @@ async def transcribe_file_whisper(file_path, model, language, output_format):
                 "cpu",  # param_50 (bgm_device)
                 256.0,  # param_51 (segment_size)
                 False,  # param_52 (save_separated_files)
-                True   # param_53 (offload_submodel_3)
-            ]
-        }
-                3,  # chunk_method
-                "int8",  # precision
-                3,  # chunk_size
-                3,  # overlap
-                True,  # diarization
-                0,  # min_speakers
-                "Hello!!",  # initial_prompt
-                0,  # length_penalty
-                3,  # repetition_penalty
-                3,  # no_repeat_ngram_size
-                3,  # temperature
-                "Hello!!",  # prompt_reset_on_temperature
-                True,  # beam_search
-                "Hello!!",  # initial_prompt_b
-                3,  # compression_ratio_threshold
-                True,  # no_speech_threshold
-                "Hello!!",  # logprob_threshold
-                "Hello!!",  # condition_on_previous_text
-                3,  # prompt_reset_on_temperature_b
-                3,  # initial_prompt_reset
-                3,  # temperature_b
-                "Hello!!",  # repetition_penalty_b
-                3,  # no_repeat_ngram_size_b
-                "Hello!!",  # prompt_reset_on_temperature_c
-                3,  # temperature_c
-                "Hello!!",  # repetition_penalty_c
-                3,  # no_repeat_ngram_size_c
-                True,  # beam_search_b
-                True,  # beam_search_c
-                0,  # min_silence_duration_ms
-                3,  # max_silence_duration_ms
-                3,  # silence_threshold
-                3,  # step_duration_ms
-                3,  # buffer_threshold
-                True,  # keep_original
-                3,  # max_prompt_length
-                3,  # max_initial_prompt_length
-                3,  # max_new_tokens
-                "cpu",  # device
-                "Hello!!",  # whisper_type
-                True,  # use_dtw
-                True,  # dtw_batch_size
-                "UVR-MDX-NET-Inst_HQ_4",  # uvr_model
-                "cpu",  # uvr_device
-                3,  # uvr_window_size
-                True,  # uvr_aggression
-                True,  # uvr_output_format
+                True,  # param_53 (offload_submodel_3)
             ]
         }
 
