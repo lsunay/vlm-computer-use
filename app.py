@@ -966,8 +966,7 @@ if __name__ == "__main__":
     demo = create_comprehensive_ui()
     demo.launch(
         server_name="0.0.0.0",
-        server_port=7860,
-        server_port_range=(7860, 7860),
+        server_port=None,  # Auto-select available port
         share=False,
         show_error=True,
     )
